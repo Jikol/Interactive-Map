@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Interactive Map</string>
+    <string name="access_token">pk.eyJ1Ijoiamlrb2xsIiwiYSI6ImNraWZkam0xejFha20ycnBvcG4ycmo1cDcifQ.WdWY65Cr8hb6YsAXYxnAgA</string>
+
+    <string name="location_permission_explanation">You need allow your location</string>
+    <string name="location_permission_not_granted">Location permissions not granted</string>
+</resources>
