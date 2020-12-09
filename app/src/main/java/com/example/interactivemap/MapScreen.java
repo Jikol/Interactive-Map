@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
@@ -43,6 +44,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     private Button optionsMenu;
     private Button gpsLocation;
 
+    private Intent intent;
     private SlidrInterface slidr;
 
     @Override
@@ -52,7 +54,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         Mapbox.getInstance(this, getString(R.string.access_token));
         setContentView(R.layout.map_screen);
 
-        SlidrConfig config = new SlidrConfig.Builder().position(SlidrPosition.BOTTOM).build();
+        SlidrConfig config = new SlidrConfig.Builder().position(SlidrPosition.BOTTOM).edge(true).edgeSize(0.12f).build();
         slidr = Slidr.attach(this, config);
 
         map = findViewById(R.id.map);
@@ -64,6 +66,15 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
         gpsLocation = findViewById(R.id.mapScreen_gpsLocationButton);
         gpsLocation.setOnClickListener(this);
+    }
+
+    private void showOptionsMenu(View v) {
+        Context wrapper = new ContextThemeWrapper(this, R.style.Map_OptionsMenu);
+        PopupMenu options = new PopupMenu(wrapper, v);
+        options.setOnMenuItemClickListener(this);
+        MenuInflater inflater = options.getMenuInflater();
+        inflater.inflate(R.menu.mapcreen_optionsmenu, options.getMenu());
+        options.show();
     }
 
     @Override
@@ -86,15 +97,6 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             } break;
         }
         return false;
-    }
-
-    private void showOptionsMenu(View v) {
-        Context wrapper = new ContextThemeWrapper(this, R.style.Map_OptionsMenu);
-        PopupMenu options = new PopupMenu(wrapper, v);
-        options.setOnMenuItemClickListener(this);
-        MenuInflater inflater = options.getMenuInflater();
-        inflater.inflate(R.menu.mapcreen_optionsmenu, options.getMenu());
-        options.show();
     }
 
     @Override
@@ -139,12 +141,13 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
     @Override
     public void finish() {
+        intent = new Intent(this, MainScreen.class);
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top);
         super.finish();
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
     @Override
-    @SuppressWarnings( {"MissingPermission"})
     protected void onStart() {
         super.onStart();
         map.onStart();
@@ -181,12 +184,8 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     }
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        map.onSaveInstanceState(outState);
     }
 }

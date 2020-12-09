@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 
+import com.mapbox.mapboxsdk.Mapbox;
+
 public class MainScreen extends AppCompatActivity implements View.OnClickListener {
 
     public Intent intent;
@@ -20,6 +22,7 @@ public class MainScreen extends AppCompatActivity implements View.OnClickListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Mapbox.getInstance(this, getString(R.string.access_token));
         setContentView(R.layout.main_screen);
 
         showFriend = findViewById(R.id.mainScreen_friendIdButton);
@@ -31,6 +34,12 @@ public class MainScreen extends AppCompatActivity implements View.OnClickListene
         newUser.setOnClickListener(this);
         loginUser.setOnClickListener(this);
         guestMap.setOnClickListener(this);
+    }
+
+    private void openMapScreen() {
+        intent = new Intent(this, MapScreen.class);
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_bottom);
     }
 
     @Override
@@ -49,11 +58,5 @@ public class MainScreen extends AppCompatActivity implements View.OnClickListene
                 openMapScreen();
             } break;
         }
-    }
-
-    private void openMapScreen() {
-        intent = new Intent(this, MapScreen.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }
