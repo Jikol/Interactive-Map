@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        mapbox:mapbox_cameraTargetLat = "51.50325"
+        mapbox:mapbox_cameraTargetLng = "-0.11968"
+        mapbox:mapbox_cameraZoom="10" >
+
+        <android.widget.Button
+            android:id="@+id/mapScreen_optionsMenu"
+            android:layout_width="31dp"
+            android:layout_height="60dp"
+            android:layout_gravity="right|top"
+            android:layout_margin="10dp"
+            android:background="@drawable/mapscreen_optionsmenubutton"
+            android:paddingTop="50dp" />
+
+        <android.widget.Button
+            android:id="@+id/mapScreen_gpsLocationButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="right|top"
+            android:layout_marginTop="13dp"
+            android:layout_marginRight="60dp"
+            android:background="@drawable/mapscreen_mylocationbutton" />
+    </com.mapbox.mapboxsdk.maps.MapView>
+
+</FrameLayout>

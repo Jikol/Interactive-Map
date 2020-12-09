@@ -4,4 +4,6 @@
 
     <string name="location_permission_explanation">You need allow your location</string>
     <string name="location_permission_not_granted">Location permissions not granted</string>
+
+    <string name="mainScreen_header">Interactive map</string>
 </resources>

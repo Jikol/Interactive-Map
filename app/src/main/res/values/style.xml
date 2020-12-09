@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Map_OptionsMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:textColor">@color/frost_white</item>
+        <item name="android:itemBackground">@color/light_blue</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="Theme.InteractiveMap.SlidrActivityTheme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+</resources>
