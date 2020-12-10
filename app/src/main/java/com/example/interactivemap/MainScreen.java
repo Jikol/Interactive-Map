@@ -22,7 +22,6 @@ public class MainScreen extends AppCompatActivity implements View.OnClickListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Mapbox.getInstance(this, getString(R.string.access_token));
         setContentView(R.layout.main_screen);
 
         showFriend = findViewById(R.id.mainScreen_friendIdButton);
