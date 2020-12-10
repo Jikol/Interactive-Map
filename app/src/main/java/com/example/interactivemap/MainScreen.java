@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 
+import com.mapbox.mapboxsdk.Mapbox;
+
 public class MainScreen extends AppCompatActivity implements View.OnClickListener {
 
     public Intent intent;
@@ -33,6 +35,12 @@ public class MainScreen extends AppCompatActivity implements View.OnClickListene
         guestMap.setOnClickListener(this);
     }
 
+    private void openMapScreen() {
+        intent = new Intent(this, MapScreen.class);
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_bottom);
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -49,11 +57,5 @@ public class MainScreen extends AppCompatActivity implements View.OnClickListene
                 openMapScreen();
             } break;
         }
-    }
-
-    private void openMapScreen() {
-        intent = new Intent(this, MapScreen.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }

@@ -10,4 +10,11 @@
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
+    <style name="MapScreen_NavTheme" parent="Theme.InteractiveMap">
+        <item name="android:textSize">25dp</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+        <item name="android:textColor">@color/frost_white</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingTop">16dp</item>
+    </style>
 </resources>

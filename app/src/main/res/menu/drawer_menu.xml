@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <group android:checkableBehavior="single"
+        android:id="@+id/grp1">
+        <item android:id="@+id/modifyNav_addPoint"
+            android:icon="@drawable/ic_baseline_control_point_24"
+            android:title="Add point" />
+        <item android:id="@+id/modifyNav_addLine"
+            android:icon="@drawable/ic_baseline_timeline_24"
+            android:title="Add line" />
+        <item android:id="@+id/modifyNav_addIcon"
+            android:icon="@drawable/ic_baseline_add_location_24"
+            android:title="Add icon" />
+    </group>
+
+    <group android:id="@+id/grp2">
+        <item android:id="@+id/modifyNav_shareMap"
+            android:icon="@drawable/ic_baseline_send_24"
+            android:title="Share map" />
+        <item android:id="@+id/modifyNav_saveMap"
+            android:icon="@drawable/ic_baseline_save_24"
+            android:title="Save map" />
+        <item android:id="@+id/modifyNav_loadMap"
+            android:icon="@drawable/ic_baseline_cloud_download_24"
+            android:title="Load map" />
+    </group>
+</menu>
