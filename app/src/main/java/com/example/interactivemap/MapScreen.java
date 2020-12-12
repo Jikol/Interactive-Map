@@ -16,10 +16,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.dunst.check.CheckableImageButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -64,7 +68,23 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     private Button optionsMenu;
     private Button gpsLocation;
     private Button openDrawer;
+    private FloatingActionButton addLineButton;
+    private FloatingActionButton addPointButton;
+    private FloatingActionButton addIconButton;
+    private FloatingActionButton showAnnotMenu;
     private NavigationView navbar;
+    private boolean fabClicked = false;
+
+    private FloatingActionButton showAnnotEdit;
+    private FloatingActionButton deleteButton;
+    private FloatingActionButton moveButton;
+    private FloatingActionButton deleteAllButton;
+    private boolean fabEditClicked = false;
+
+    private Animation rotateOpen;
+    private Animation rotateClose;
+    private Animation fromBottom;
+    private Animation toBottom;
 
     private Intent intent;
     private SlidrInterface slidr;
@@ -87,6 +107,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         getSupportActionBar().hide();
         Mapbox.getInstance(this, getString(R.string.access_token));
         setContentView(R.layout.map_screen);
+        getWindow().setNavigationBarColor(getResources().getColor(R.color.dark_blue));
 
         SlidrConfig config = new SlidrConfig.Builder().position(SlidrPosition.BOTTOM).edge(true).edgeSize(0.12f).build();
         slidr = Slidr.attach(this, config);
@@ -109,6 +130,29 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         navbar.setNavigationItemSelectedListener(this);
 
         preferences = getPreferences(MODE_PRIVATE);
+
+        addLineButton = findViewById(R.id.mapScreen_addLineButton);
+        addPointButton = findViewById(R.id.mapScreen_addPointButton);
+        addIconButton = findViewById(R.id.mapScreen_addIconButton);
+        showAnnotMenu = findViewById(R.id.mapScreen_floatButton);
+        addLineButton.setOnClickListener(this);
+        addPointButton.setOnClickListener(this);
+        addIconButton.setOnClickListener(this);
+        showAnnotMenu.setOnClickListener(this);
+
+        showAnnotEdit = findViewById(R.id.mapScreen_floatButtonEdit);
+        moveButton = findViewById(R.id.mapScreen_moveButton);
+        deleteButton = findViewById(R.id.mapScreen_deleteButton);
+        deleteAllButton = findViewById(R.id.mapScreen_deleteAll);
+        showAnnotEdit.setOnClickListener(this);
+        moveButton.setOnClickListener(this);
+        deleteButton.setOnClickListener(this);
+        deleteAllButton.setOnClickListener(this);
+
+        rotateOpen = AnimationUtils.loadAnimation(this, R.anim.rotate_open_anim);
+        rotateClose = AnimationUtils.loadAnimation(this, R.anim.rotate_close_anim);
+        fromBottom = AnimationUtils.loadAnimation(this, R.anim.from_bottom_anim);
+        toBottom = AnimationUtils.loadAnimation(this, R.anim.to_bottom_anim);
 
         if (guest) {
             initGuestInteraction();
@@ -163,6 +207,83 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         }
     }
 
+    private void showAnnotButtons() {
+        setVisibility(fabClicked);
+        setAnimation(fabClicked);
+        setClickable(fabClicked);
+        fabClicked = !fabClicked;
+    }
+
+    private void showAnnotEdit() {
+        setVisibilityEdit(fabEditClicked);
+        setAnimationEdit(fabEditClicked);
+        fabEditClicked = !fabEditClicked;
+    }
+
+    private void setVisibility(boolean fabClicked) {
+        if (!fabClicked) {
+            addPointButton.setVisibility(View.VISIBLE);
+            addIconButton.setVisibility(View.VISIBLE);
+            addLineButton.setVisibility(View.VISIBLE);
+        } else {
+            addPointButton.setVisibility(View.INVISIBLE);
+            addIconButton.setVisibility(View.INVISIBLE);
+            addLineButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void setVisibilityEdit(boolean fabClicked) {
+        if (!fabClicked) {
+            moveButton.setVisibility(View.VISIBLE);
+            deleteButton.setVisibility(View.VISIBLE);
+            deleteAllButton.setVisibility(View.VISIBLE);
+        } else {
+            moveButton.setVisibility(View.INVISIBLE);
+            deleteButton.setVisibility(View.INVISIBLE);
+            deleteAllButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void setClickable(boolean fabClicked) {
+        if (!fabClicked) {
+            addPointButton.setClickable(true);
+            addIconButton.setClickable(true);
+            addLineButton.setClickable(true);
+        } else {
+            addPointButton.setClickable(false);
+            addIconButton.setClickable(false);
+            addLineButton.setClickable(false);
+        }
+    }
+
+    private void setAnimation(boolean fabClicked) {
+        if (!fabClicked) {
+            addLineButton.startAnimation(fromBottom);
+            addIconButton.startAnimation(fromBottom);
+            addPointButton.startAnimation(fromBottom);
+            showAnnotMenu.startAnimation(rotateOpen);
+        } else {
+            addLineButton.startAnimation(toBottom);
+            addIconButton.startAnimation(toBottom);
+            addPointButton.startAnimation(toBottom);
+            showAnnotMenu.startAnimation(rotateClose);
+        }
+    }
+
+    private void setAnimationEdit(boolean fabClicked) {
+        if (!fabClicked) {
+            moveButton.startAnimation(fromBottom);
+            deleteButton.startAnimation(fromBottom);
+            deleteAllButton.startAnimation(fromBottom);
+            showAnnotEdit.startAnimation(rotateOpen);
+        } else {
+            moveButton.startAnimation(toBottom);
+            deleteButton.startAnimation(toBottom);
+            deleteAllButton.startAnimation(toBottom);
+            showAnnotEdit.startAnimation(rotateClose);
+        }
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -175,86 +296,66 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             case R.id.mapScreen_gpsLocationButton: {
                 mapBox.getStyle(style -> enableLocation(style));
             } break;
+            case R.id.mapScreen_addIconButton: {
+                pointsSelected = false;
+                lineSelected = false;
+                iconSelected = !iconDelete;
+                iconMove = false;
+                iconDelete = false;
+            } break;
+            case R.id.mapScreen_addPointButton: {
+                pointsSelected = !pointsSelected;
+                lineSelected = false;
+                iconSelected = false;
+                iconMove = false;
+                iconDelete = false;
+            } break;
+            case R.id.mapScreen_addLineButton: {
+                pointsSelected = false;
+                lineSelected = !lineSelected;
+                iconSelected = false;
+                iconMove = false;
+                iconDelete = false;
+            } break;
+            case R.id.mapScreen_floatButton: {
+                pointsSelected = false;
+                lineSelected = false;
+                iconSelected = false;
+                showAnnotButtons();
+            } break;
+            case R.id.mapScreen_deleteButton: {
+                pointsSelected = false;
+                lineSelected = false;
+                iconSelected = false;
+                iconMove = false;
+                iconDelete = !iconDelete;
+            } break;
+            case R.id.mapScreen_moveButton: {
+                pointsSelected = false;
+                lineSelected = false;
+                iconSelected = false;
+                iconMove = !iconMove;
+                iconDelete = false;
+            } break;
+            case R.id.mapScreen_deleteAll: {
+                circleManager.deleteAll();
+                circleOptionsList.clear();
+                SharedPreferences.Editor prefEditor = preferences.edit();
+                prefEditor.remove("points");
+                prefEditor.commit();
+            } break;
+            case R.id.mapScreen_floatButtonEdit: {
+                iconMove = false;
+                iconDelete = false;
+                showAnnotEdit();
+            } break;
         }
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.modifyNav_addPoint: {
-                if (item.isChecked()) {
-                    item.setChecked(false);
-                    pointsSelected = false;
-                    lineSelected = false;
-                    iconSelected = false;
-                } else {
-                    item.setChecked(true);
-                    pointsSelected = true;
-                    lineSelected = false;
-                    iconSelected = false;
-                    drawer.closeDrawer(Gravity.LEFT);
-                }
-            } break;
-            case R.id.modifyNav_addLine: {
-                if (item.isChecked()) {
-                    item.setChecked(false);
-                    pointsSelected = false;
-                    lineSelected = false;
-                    iconSelected = false;
-                } else {
-                    item.setChecked(true);
-                    pointsSelected = false;
-                    lineSelected = true;
-                    iconSelected = false;
-                    drawer.closeDrawer(Gravity.LEFT);
-                }
-            } break;
-            case R.id.modifyNav_addIcon: {
-                if (item.isChecked()) {
-                    item.setChecked(false);
-                    pointsSelected = false;
-                    lineSelected = false;
-                    iconSelected = false;
-                } else {
-                    item.setChecked(true);
-                    pointsSelected = false;
-                    lineSelected = true;
-                    iconSelected = false;
-                    drawer.closeDrawer(Gravity.LEFT);
-                }
-            } break;
-            case R.id.modifyMove: {
-                if (item.isChecked()) {
-                    item.setChecked(false);
-                    iconMove = false;
-                    iconDelete = false;
-                } else {
-                    item.setChecked(true);
-                    iconMove = true;
-                    iconDelete = false;
-                    drawer.closeDrawer(Gravity.LEFT);
-                }
-            } break;
-            case R.id.modifyDelete: {
-                if (item.isChecked()) {
-                    item.setChecked(false);
-                    iconMove = false;
-                    iconDelete = false;
-                } else {
-                    item.setChecked(true);
-                    iconMove = false;
-                    iconDelete = true;
-                    drawer.closeDrawer(Gravity.LEFT);
-                }
-            } break;
-            case R.id.modifyDeleteAll: {
-                circleManager.deleteAll();
-                circleOptionsList.clear();
-                SharedPreferences.Editor prefEditor = preferences.edit();
-                prefEditor.remove("points");
-                prefEditor.commit();
-                drawer.closeDrawer(Gravity.LEFT);
-            } break;
+
         }
         return true;
     }
@@ -274,7 +375,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         this.mapBox = mapBox;
         mapBox.setStyle(Style.DARK, style -> {
             circleManager = new CircleManager(map, mapBox, style);
-            circleManager.addClickListener(circle -> {
+            circleManager.addLongClickListener(circle -> {
                 if (iconDelete) {
                     circleManager.delete(circle);
                 }
@@ -357,7 +458,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         prefEditor.putString("position", jsonPosition);
         prefEditor.commit();
         super.finish();
-        overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top);
+        //overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top);
     }
 
     @Override

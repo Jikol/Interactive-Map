@@ -1,14 +1,14 @@
 package com.example.interactivemap;
 
+import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-
-import com.mapbox.mapboxsdk.Mapbox;
 
 public class MainScreen extends AppCompatActivity implements View.OnClickListener {
 
@@ -23,6 +23,7 @@ public class MainScreen extends AppCompatActivity implements View.OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
+        getWindow().setNavigationBarColor(getResources().getColor(R.color.dark_blue));
 
         showFriend = findViewById(R.id.mainScreen_friendIdButton);
         newUser = findViewById(R.id.mainScreen_newUserButton);
@@ -38,7 +39,7 @@ public class MainScreen extends AppCompatActivity implements View.OnClickListene
     private void openMapScreen() {
         intent = new Intent(this, MapScreen.class);
         startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_bottom);
+        //overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_bottom);
     }
 
     @Override

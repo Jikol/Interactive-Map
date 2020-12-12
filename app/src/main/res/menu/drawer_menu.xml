@@ -3,32 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mapScreenDrawerMenu"
     tools:showIn="navigation_view">
-    <group android:checkableBehavior="single"
-        android:id="@+id/grp1">
-        <item android:id="@+id/modifyNav_addPoint"
-            android:icon="@drawable/ic_baseline_control_point_24"
-            android:title="Add point" />
-        <item android:id="@+id/modifyNav_addLine"
-            android:icon="@drawable/ic_baseline_timeline_24"
-            android:title="Add line" />
-        <item android:id="@+id/modifyNav_addIcon"
-            android:icon="@drawable/ic_baseline_add_location_24"
-            android:title="Add icon" />
-    </group>
-
-    <group android:checkableBehavior="single"
-        android:id="@+id/grp2">
-        <item android:id="@+id/modifyMove"
-            android:icon="@drawable/ic_baseline_move_24"
-            android:title="Move icon" />
-        <item android:id="@+id/modifyDelete"
-            android:icon="@drawable/ic_baseline_delete_forever_24"
-            android:title="Delete icon" />
-    </group>
-
-    <item android:id="@+id/modifyDeleteAll"
-        android:icon="@drawable/ic_baseline_delete_forever_24"
-        android:title="Delete all" />
 
     <group android:id="@+id/grp3">
         <item android:id="@+id/modifyNav_shareMap"
