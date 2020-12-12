@@ -1,7 +1,6 @@
 package com.example.interactivemap;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -13,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +26,6 @@ import com.google.gson.reflect.TypeToken;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -41,12 +40,16 @@ import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.plugins.annotation.Circle;
 import com.mapbox.mapboxsdk.plugins.annotation.CircleManager;
 import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions;
+import com.mapbox.mapboxsdk.plugins.annotation.OnCircleClickListener;
+import com.mapbox.mapboxsdk.plugins.annotation.OnCircleDragListener;
+import com.mapbox.mapboxsdk.plugins.annotation.OnSymbolClickListener;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
 import com.r0adkll.slidr.Slidr;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrInterface;
 import com.r0adkll.slidr.model.SlidrPosition;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,12 +71,15 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     private DrawerLayout drawer;
     protected SharedPreferences preferences;
 
-    private static CameraPosition position = new CameraPosition.Builder()
-            .target(new LatLng(51.50550, -0.07520))
-            .zoom(12)
-            .build();
+    private CameraPosition position;
     private static boolean guest = true;
-    private static List<CircleOptions> circleOptionsList;
+    private List<CircleOptions> circleOptionsList;
+
+    private boolean pointsSelected = false;
+    private boolean lineSelected = false;
+    private boolean iconSelected = false;
+    private boolean iconMove = false;
+    private boolean iconDelete = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,9 +97,6 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
         optionsMenu = findViewById(R.id.mapScreen_optionsMenu);
         optionsMenu.setOnClickListener(this);
-        if (guest) {
-            optionsMenu.setVisibility(View.GONE);
-        }
 
         gpsLocation = findViewById(R.id.mapScreen_gpsLocationButton);
         gpsLocation.setOnClickListener(this);
@@ -106,6 +109,10 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         navbar.setNavigationItemSelectedListener(this);
 
         preferences = getPreferences(MODE_PRIVATE);
+
+        if (guest) {
+            initGuestInteraction();
+        }
     }
 
     private void showOptionsMenu(View v) {
@@ -117,10 +124,40 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         options.show();
     }
 
-    private void initPersistanceStorage(CircleManager circleManager) {
+    private void initGuestInteraction() {
+        Menu menu = navbar.getMenu();
+        menu.findItem(R.id.modifyNav_shareMap).setVisible(false);
+        menu.findItem(R.id.modifyNav_saveMap).setVisible(false);
+        menu.findItem(R.id.modifyNav_loadMap).setVisible(false);
+
+        optionsMenu.setVisibility(View.GONE);
+    }
+
+    private void initCamera() {
+        Gson gson = new Gson();
+        String jsonPosition = preferences.getString("position", null);
+        if (jsonPosition == null) {
+            position = new CameraPosition.Builder()
+                    .target(new LatLng(51.50550, -0.07520))
+                    .zoom(12)
+                    .build();
+        } else {
+            try {
+                position = gson.fromJson(jsonPosition, CameraPosition.class);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private void initMapPoint(CircleManager circleManager) {
         Gson gson = new Gson();
         String json = preferences.getString("points", "");
-        circleOptionsList = gson.fromJson(json, new TypeToken<List<CircleOptions>>(){}.getType());
+        try {
+            circleOptionsList = gson.fromJson(json, new TypeToken<List<CircleOptions>>(){}.getType());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         if (circleOptionsList != null) {
             circleManager.create(circleOptionsList);
         }
@@ -145,13 +182,78 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.modifyNav_addPoint: {
-
+                if (item.isChecked()) {
+                    item.setChecked(false);
+                    pointsSelected = false;
+                    lineSelected = false;
+                    iconSelected = false;
+                } else {
+                    item.setChecked(true);
+                    pointsSelected = true;
+                    lineSelected = false;
+                    iconSelected = false;
+                    drawer.closeDrawer(Gravity.LEFT);
+                }
             } break;
             case R.id.modifyNav_addLine: {
-
+                if (item.isChecked()) {
+                    item.setChecked(false);
+                    pointsSelected = false;
+                    lineSelected = false;
+                    iconSelected = false;
+                } else {
+                    item.setChecked(true);
+                    pointsSelected = false;
+                    lineSelected = true;
+                    iconSelected = false;
+                    drawer.closeDrawer(Gravity.LEFT);
+                }
             } break;
             case R.id.modifyNav_addIcon: {
-
+                if (item.isChecked()) {
+                    item.setChecked(false);
+                    pointsSelected = false;
+                    lineSelected = false;
+                    iconSelected = false;
+                } else {
+                    item.setChecked(true);
+                    pointsSelected = false;
+                    lineSelected = true;
+                    iconSelected = false;
+                    drawer.closeDrawer(Gravity.LEFT);
+                }
+            } break;
+            case R.id.modifyMove: {
+                if (item.isChecked()) {
+                    item.setChecked(false);
+                    iconMove = false;
+                    iconDelete = false;
+                } else {
+                    item.setChecked(true);
+                    iconMove = true;
+                    iconDelete = false;
+                    drawer.closeDrawer(Gravity.LEFT);
+                }
+            } break;
+            case R.id.modifyDelete: {
+                if (item.isChecked()) {
+                    item.setChecked(false);
+                    iconMove = false;
+                    iconDelete = false;
+                } else {
+                    item.setChecked(true);
+                    iconMove = false;
+                    iconDelete = true;
+                    drawer.closeDrawer(Gravity.LEFT);
+                }
+            } break;
+            case R.id.modifyDeleteAll: {
+                circleManager.deleteAll();
+                circleOptionsList.clear();
+                SharedPreferences.Editor prefEditor = preferences.edit();
+                prefEditor.remove("points");
+                prefEditor.commit();
+                drawer.closeDrawer(Gravity.LEFT);
             } break;
         }
         return true;
@@ -173,21 +275,20 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         mapBox.setStyle(Style.DARK, style -> {
             circleManager = new CircleManager(map, mapBox, style);
             circleManager.addClickListener(circle -> {
-                Toast.makeText(MapScreen.this,
-                        String.format("Circle clicked %s", circle.getId()),
-                        Toast.LENGTH_SHORT
-                ).show();
+                if (iconDelete) {
+                    circleManager.delete(circle);
+                }
+                if (iconMove) {
+                    circle.setDraggable(true);
+                } else {
+                    circle.setDraggable(false);
+                }
                 return false;
             });
-            circleManager.addLongClickListener(circle -> {
-                Toast.makeText(MapScreen.this,
-                        String.format("Circle long clicked %s", circle.getId()),
-                        Toast.LENGTH_SHORT
-                ).show();
-                return false;
-            });
-            initPersistanceStorage(circleManager);
+            initMapPoint(circleManager);
         });
+
+        initCamera();
 
         mapBox.addOnCameraMoveListener(() -> {
             position = mapBox.getCameraPosition();
@@ -199,13 +300,15 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
             if (circleOptionsList == null) {
                 circleOptionsList = new ArrayList<>();
             }
-            CircleOptions circleOptions = new CircleOptions()
-                    .withLatLng(point)
-                    .withCircleColor(ColorUtils.colorToRgbaString(Color.YELLOW))
-                    .withCircleRadius(12f)
-                    .withDraggable(true);
-            circleManager.create(circleOptions);
-            circleOptionsList.add(circleOptions);
+            if (pointsSelected) {
+                CircleOptions circleOptions = new CircleOptions()
+                        .withLatLng(point)
+                        .withCircleColor(ColorUtils.colorToRgbaString(Color.YELLOW))
+                        .withCircleRadius(12f)
+                        .withDraggable(false);
+                circleManager.create(circleOptions);
+                circleOptionsList.add(circleOptions);
+            }
             return true;
         });
     }
@@ -248,8 +351,10 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     public void finish() {
         SharedPreferences.Editor prefEditor = preferences.edit();
         Gson gson = new Gson();
-        String json = gson.toJson(circleOptionsList);
-        prefEditor.putString("points", json);
+        String jsonPoints = gson.toJson(circleOptionsList);
+        prefEditor.putString("points", jsonPoints);
+        String jsonPosition = gson.toJson(position);
+        prefEditor.putString("position", jsonPosition);
         prefEditor.commit();
         super.finish();
         overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top);
