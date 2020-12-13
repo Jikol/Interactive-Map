@@ -73,7 +73,7 @@
             mapbox:backgroundTint="@color/rusty_gold"
             mapbox:backgroundTintMode="add"
             mapbox:borderWidth="0dp"
-            mapbox:srcCompat="@drawable/ic_baseline_add_24"
+            mapbox:srcCompat="@drawable/ic_baseline_create_24"
             mapbox:tint="@color/rusty_gold" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -214,6 +214,21 @@
             mapbox:borderWidth="0dp"
             mapbox:srcCompat="@drawable/ic_baseline_timeline_24"
             mapbox:tint="@color/rusty_gold" />
+
+        <Button
+            android:id="@+id/mapScreen_endLineButton"
+            android:layout_width="wrap_content"
+            android:layout_height="58dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="18dp"
+            android:backgroundTint="@color/light_blue"
+            android:clickable="false"
+            android:fontFamily="@font/montserrat"
+            android:text="End line"
+            android:textColor="@color/frost_white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="invisible" />
 
     </com.mapbox.mapboxsdk.maps.MapView>
 

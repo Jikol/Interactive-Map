@@ -39,7 +39,6 @@ public class MainScreen extends AppCompatActivity implements View.OnClickListene
     private void openMapScreen() {
         intent = new Intent(this, MapScreen.class);
         startActivity(intent);
-        //overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_bottom);
     }
 
     @Override
