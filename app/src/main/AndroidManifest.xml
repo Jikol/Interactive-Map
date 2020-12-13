@@ -10,11 +10,15 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:name=".Context"
         android:theme="@style/Theme.InteractiveMap">
+        <activity android:name=".LoginScreen"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" ></activity>
+        <activity android:name=".RegisterScreen"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <activity
             android:name=".MapScreen"
-            android:theme="@style/Theme.InteractiveMap.SlidrActivityTheme">
-        </activity>
+            android:theme="@style/Theme.InteractiveMap.SlidrActivityTheme" />
         <activity
             android:name=".MainScreen"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">

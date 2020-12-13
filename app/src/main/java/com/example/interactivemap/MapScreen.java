@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.Menu;
@@ -22,8 +21,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.Toast;
-
-import com.dunst.check.CheckableImageButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
@@ -38,20 +35,15 @@ import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
 import com.mapbox.mapboxsdk.location.modes.RenderMode;
-import com.mapbox.mapboxsdk.maps.ImageContent;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
-import com.mapbox.mapboxsdk.plugins.annotation.Circle;
 import com.mapbox.mapboxsdk.plugins.annotation.CircleManager;
 import com.mapbox.mapboxsdk.plugins.annotation.CircleOptions;
 import com.mapbox.mapboxsdk.plugins.annotation.Line;
 import com.mapbox.mapboxsdk.plugins.annotation.LineManager;
 import com.mapbox.mapboxsdk.plugins.annotation.LineOptions;
-import com.mapbox.mapboxsdk.plugins.annotation.OnCircleClickListener;
-import com.mapbox.mapboxsdk.plugins.annotation.OnCircleDragListener;
-import com.mapbox.mapboxsdk.plugins.annotation.OnSymbolClickListener;
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
@@ -62,7 +54,6 @@ import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrInterface;
 import com.r0adkll.slidr.model.SlidrPosition;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,7 +100,6 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     protected SharedPreferences preferences;
 
     private CameraPosition position;
-    private static boolean guest = true;
     private List<CircleOptions> circleOptionsList;
     private List<LatLng> actualLineCoords;
     private List<LineOptions> lineOptionsList;
@@ -181,7 +171,10 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         fromBottomEdit = AnimationUtils.loadAnimation(this, R.anim.from_bottom_anim_edit);
         rotateOpenEdit = AnimationUtils.loadAnimation(this, R.anim.rotate_open_anim_edit);
 
-        if (guest) {
+        intent = getIntent();
+        if (intent.getBooleanExtra("auth_result", false)) {
+            initMemberInteraction();
+        } else {
             initGuestInteraction();
         }
     }
@@ -204,6 +197,17 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         optionsMenu.setVisibility(View.GONE);
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         openDrawer.setVisibility(View.GONE);
+    }
+
+    private void initMemberInteraction() {
+        Menu menu = navbar.getMenu();
+        menu.findItem(R.id.modifyNav_shareMap).setVisible(true);
+        menu.findItem(R.id.modifyNav_saveMap).setVisible(true);
+        menu.findItem(R.id.modifyNav_loadMap).setVisible(true);
+
+        optionsMenu.setVisibility(View.VISIBLE);
+        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        openDrawer.setVisibility(View.VISIBLE);
     }
 
     private void initCamera() {

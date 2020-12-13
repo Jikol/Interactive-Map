@@ -4,6 +4,19 @@
     android:id="@+id/mapScreenDrawerMenu"
     tools:showIn="navigation_view">
 
+    <group android:id="@+id/grp1">
+        <item android:id="@+id/mapScreen_userName"
+            android:title="User" />
+        <item android:id="@+id/mapScreen_userId"
+            android:title="ID: 5" />
+    </group>
+
+    <item android:id="@+id/mapScreen_userFocus"
+        android:title="Focus: engineer" />
+
+    <item android:id="@+id/mapScreen_addTeam"
+        android:title="Team: empty" />
+
     <group android:id="@+id/grp3">
         <item android:id="@+id/modifyNav_shareMap"
             android:icon="@drawable/ic_baseline_send_24"
