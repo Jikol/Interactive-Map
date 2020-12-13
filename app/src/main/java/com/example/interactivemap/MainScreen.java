@@ -1,13 +1,9 @@
 package com.example.interactivemap;
-
-import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 
 public class MainScreen extends AppCompatActivity implements View.OnClickListener {
@@ -34,10 +30,22 @@ public class MainScreen extends AppCompatActivity implements View.OnClickListene
         newUser.setOnClickListener(this);
         loginUser.setOnClickListener(this);
         guestMap.setOnClickListener(this);
+
+        Context.setContext((Context) getApplicationContext());
     }
 
     private void openMapScreen() {
         intent = new Intent(this, MapScreen.class);
+        startActivity(intent);
+    }
+
+    private void openNewUser() {
+        intent = new Intent(this, RegisterScreen.class);
+        startActivity(intent);
+    }
+
+    private void openLogin() {
+        intent = new Intent(this, LoginScreen.class);
         startActivity(intent);
     }
 
@@ -48,10 +56,10 @@ public class MainScreen extends AppCompatActivity implements View.OnClickListene
 
             } break;
             case R.id.mainScreen_newUserButton: {
-
+                openNewUser();
             } break;
             case R.id.mainScreen_loginUserButton: {
-
+                openLogin();
             } break;
             case R.id.mainScreen_guestMapButton: {
                 openMapScreen();
