@@ -29,7 +29,7 @@ public class Database extends SQLiteOpenHelper {
     private Context context = com.example.interactivemap.Context.getContext();
 
     public Database(@Nullable Context context) {
-        super(context, DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, 3);
     }
 
     @Override
@@ -75,9 +75,9 @@ public class Database extends SQLiteOpenHelper {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public Cursor getMember(Member member) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String retrieveSql = "SELECT m.member_id, m.name, m.focus\n" +
-                "FROM MEMBER m\n" +
-                "WHERE m.name = " + member.getName() + " AND m.password = " + member.getHashedPassword();
-        return db.rawQuery(retrieveSql, null);
+        String retrieveSql = "SELECT member_id, name, focus, password\n" +
+                "FROM MEMBER\n" +
+                "WHERE name = ?";
+        return db.rawQuery(retrieveSql, new String[] {member.getName()});
     }
 }

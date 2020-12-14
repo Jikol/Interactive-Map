@@ -18,6 +18,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -152,12 +154,22 @@ public class RegisterScreen extends AppCompatActivity {
             protected void onPostExecute(Object o) {
                 Cursor cursor = (Cursor)o;
                 if (cursor.getCount() >= 1) {
+                    cursor.moveToFirst();
+                    do {
+                        member.setName(cursor.getString(cursor.getColumnIndex("name")));
+                        member.setFocus(cursor.getString(cursor.getColumnIndex("focus")));
+                        member.setId(Integer.parseInt(cursor.getString(cursor.getColumnIndex("member_id"))));
+                    } while (cursor.moveToNext());
+                    cursor.close();
                     isLogged[0] = true;
                 }
 
                 if (isLogged[0]) {
                     intent = new Intent(RegisterScreen.this, MapScreen.class);
                     intent.putExtra("auth_result", isLogged[0]);
+                    Gson gson = new Gson();
+                    String jsonMember = gson.toJson(member);
+                    intent.putExtra("user", jsonMember);
                     startActivity(intent);
                     finish();
                 } else {

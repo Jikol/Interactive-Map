@@ -6,4 +6,7 @@
     <string name="location_permission_not_granted">Location permissions not granted</string>
 
     <string name="mainScreen_header">Interactive map</string>
+    <string name="userName"></string>
+    <string name="userFocus"></string>
+    <string name="userId"></string>
 </resources>
