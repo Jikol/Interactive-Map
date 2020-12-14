@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.Menu;
@@ -78,6 +79,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     private NavigationView navbar;
     private boolean fabClicked = false;
     private boolean newLine = false;
+    private boolean guest = true;
 
     private FloatingActionButton showAnnotEdit;
     private FloatingActionButton deleteButton;
@@ -98,6 +100,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     private SlidrInterface slidr;
     private DrawerLayout drawer;
     protected SharedPreferences preferences;
+    private Member member;
 
     private CameraPosition position;
     private List<CircleOptions> circleOptionsList;
@@ -173,7 +176,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
 
         intent = getIntent();
         if (intent.getBooleanExtra("auth_result", false)) {
-            initMemberInteraction();
+            initMemberInteraction(intent);
         } else {
             initGuestInteraction();
         }
@@ -199,15 +202,34 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         openDrawer.setVisibility(View.GONE);
     }
 
-    private void initMemberInteraction() {
+    private void initMemberInteraction(Intent intent) {
         Menu menu = navbar.getMenu();
         menu.findItem(R.id.modifyNav_shareMap).setVisible(true);
         menu.findItem(R.id.modifyNav_saveMap).setVisible(true);
         menu.findItem(R.id.modifyNav_loadMap).setVisible(true);
+        guest = false;
+
+        MenuItem userName = menu.findItem(R.id.mapScreen_userName);
+        MenuItem userFocus = menu.findItem(R.id.mapScreen_userFocus);
+        MenuItem userId = menu.findItem(R.id.mapScreen_userId);
 
         optionsMenu.setVisibility(View.VISIBLE);
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         openDrawer.setVisibility(View.VISIBLE);
+        Gson gson = new Gson();
+        String user = intent.getStringExtra("user");
+        member = new Member();
+
+        try {
+            member = gson.fromJson(user, Member.class);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        userName.setTitle(member.getName());
+        userFocus.setTitle(member.getFocus());
+        userId.setTitle(member.getId().toString());
+        navbar.setNavigationItemSelectedListener(this);
     }
 
     private void initCamera() {
@@ -418,7 +440,7 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.mapScreen_logOutButton: {
-
+                finish();
             } break;
         }
         return false;
@@ -593,6 +615,13 @@ public class MapScreen extends AppCompatActivity implements OnMapReadyCallback, 
         prefEditor.putString("position", jsonPosition);
         prefEditor.commit();
         super.finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (guest) {
+            super.onBackPressed();
+        }
     }
 
     @Override

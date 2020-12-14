@@ -14,16 +14,14 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.util.Base64;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
+
 public class Member {
 
+    private Integer id;
     private String name;
     private String password;
     private String focus;
-
-    private static final Random RANDOM = new SecureRandom();
-    private static final String ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    private static final int ITERATIONS = 10;
-    private static final int KEY_LENGTH = 100;
 
     public Member() {
         this.name = "";
@@ -55,6 +53,14 @@ public class Member {
         this.focus = focus;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    /*
     public static String getSalt(int length) {
         StringBuilder returnValue = new StringBuilder(length);
         for (int i = 0; i < length; i++) {
@@ -81,5 +87,14 @@ public class Member {
         String salt = getSalt(5);
         byte[] securePassword = hashPassword(password.toCharArray(), salt.getBytes());
         return Base64.getEncoder().encodeToString(securePassword);
+    }
+    */
+
+    public static String generatePassword(String password) {
+        return BCrypt.withDefaults().hashToString(12, password.toCharArray());
+    }
+
+    public static BCrypt.Result verifyPassword(String password, String hashedPassword) {
+        return BCrypt.verifyer().verify(password.toCharArray(), hashedPassword);
     }
 }

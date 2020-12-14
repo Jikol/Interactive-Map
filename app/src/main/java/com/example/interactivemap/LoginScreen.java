@@ -10,10 +10,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+
+import at.favre.lib.crypto.bcrypt.BCrypt;
 
 public class LoginScreen extends AppCompatActivity {
 
@@ -49,11 +54,6 @@ public class LoginScreen extends AppCompatActivity {
             @Override
             protected void onPreExecute() {
                 member.setName(name.getText().toString());
-                try {
-                    member.setPassword(password.getText().toString());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -64,16 +64,30 @@ public class LoginScreen extends AppCompatActivity {
             protected void onPostExecute(Object o) {
                 Cursor cursor = (Cursor)o;
                 if (cursor.getCount() >= 1) {
-                    isLogged[0] = true;
+                    cursor.moveToFirst();
+                    String hashedPassword = cursor.getString(cursor.getColumnIndex("password"));
+                    BCrypt.Result result = Member.verifyPassword(password.getText().toString(), hashedPassword);
+                    if (result.verified) {
+                        do {
+                            member.setName(cursor.getString(cursor.getColumnIndex("name")));
+                            member.setFocus(cursor.getString(cursor.getColumnIndex("focus")));
+                            member.setId(Integer.parseInt(cursor.getString(cursor.getColumnIndex("member_id"))));
+                        } while (cursor.moveToNext());
+                        cursor.close();
+                        isLogged[0] = true;
+                    }
                 }
 
                 if (isLogged[0]) {
                     intent = new Intent(LoginScreen.this, MapScreen.class);
                     intent.putExtra("auth_result", isLogged[0]);
+                    Gson gson = new Gson();
+                    String jsonMember = gson.toJson(member);
+                    intent.putExtra("user", jsonMember);
                     startActivity(intent);
                     finish();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Something gone wrong", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Your credentials are incorrect", Toast.LENGTH_LONG).show();
                 }
             }
         }.execute();
